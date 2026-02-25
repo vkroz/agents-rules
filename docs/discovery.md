@@ -1,6 +1,6 @@
 Here we gather and consolidate best practices of using claude code and cursor. 
 
-The objective is to create consoliudated list of best practices, and translate them in capabilities of `agent-conf` tool.
+The objective is to create consoliudated list of best practices, and translate them in capabilities of `agent-pack` tool.
 
 ## Claude Code
 

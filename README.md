@@ -1,4 +1,4 @@
-# agent-conf
+# agent-pack
 
 A tools to manage agents configuration.
 
@@ -9,14 +9,14 @@ One set of agent rules, compiled to every tool's format (`CLAUDE.md`, `.cursor/r
 
 **Installation**:
 ```bash
-uv tool install git+https://github.com/vkroz/agent-conf
+uv tool install git+https://github.com/numio-ai/agent-pack
 ```
 
 **Core workflows**:
-- **Init**: Bootstrap the `agent-conf/` directory structure in a new repo
-- **Generate**: Transform vendor-neutral canonical rulesets (YAML + markdown in `agent-conf/`) into tool-specific outputs (`.agent-conf/` → `CLAUDE.md`, `.cursor/rules/`, etc.)
-- **Sync**: Pull shared agent-conf from remote git repos (a public general-purpose agent-conf repo, plus org-private ones)
-- **Hierarchical inheritance**: Resolve agent-conf across global → org → project → repo → user levels, controlled via `agent-conf.yaml` (specifying target agents, `nested_depth`, etc.)
+- **Init**: Bootstrap the `agent-pack/` directory structure in a new repo
+- **Generate**: Transform vendor-neutral canonical rulesets (YAML + markdown in `agent-pack/`) into tool-specific outputs (`.agent-pack/` → `CLAUDE.md`, `.cursor/rules/`, etc.)
+- **Sync**: Pull shared agent-pack from remote git repos (a public general-purpose agent-pack repo, plus org-private ones)
+- **Hierarchical inheritance**: Resolve agent-pack across global → org → project → repo → user levels, controlled via `agent-pack.yaml` (specifying target agents, `nested_depth`, etc.)
 
 **Additional context**
 

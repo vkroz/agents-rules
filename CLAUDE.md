@@ -4,15 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**agent-conf** is a Python CLI tool that manages AI agent configurations across multiple tools (Claude Code, Cursor, Copilot, etc.). It acts as a compiler: vendor-neutral canonical rulesets (YAML + markdown) are transformed into tool-specific outputs (`CLAUDE.md`, `.cursor/rules/`, `AGENTS.md`, etc.).
+**agent-pack** is a Python CLI tool that manages AI agent configurations across multiple tools (Claude Code, Cursor, Copilot, etc.). It acts as a compiler: vendor-neutral canonical rulesets (YAML + markdown) are transformed into tool-specific outputs (`CLAUDE.md`, `.cursor/rules/`, `AGENTS.md`, etc.).
 
-The core abstraction is **hierarchical inheritance** — configurations resolve across global → org → project → repo → user levels, controlled via `agent-conf.yaml`.
+The core abstraction is **hierarchical inheritance** — configurations resolve across global → org → project → repo → user levels, controlled via `agent-pack.yaml`.
 
 ## Core CLI Commands
 
-- **`agentconf init`** — Bootstrap the `agent-conf/` directory structure in a repo
-- **`agentconf generate`** — Compile canonical rulesets into tool-specific config files
-- **`agentconf sync`** — Pull shared configurations from remote git repos (public + org-private)
+- **`agentpack init`** — Bootstrap the `agent-pack/` directory structure in a repo
+- **`agentpack generate`** — Compile canonical rulesets into tool-specific config files
+- **`agentpack sync`** — Pull shared configurations from remote git repos (public + org-private)
 
 ## Tech Stack
 
@@ -27,7 +27,7 @@ The core abstraction is **hierarchical inheritance** — configurations resolve 
 uv sync
 
 # Run the CLI locally
-uv run agentconf
+uv run agentpack
 
 # Run tests
 uv run pytest
@@ -44,8 +44,8 @@ uv run ruff format .
 The tool follows a **compilation model**: canonical source configs are the single source of truth, and tool-specific files are generated outputs. This distinguishes it from simpler file-sync tools.
 
 Key concepts:
-- **Canonical format**: Vendor-neutral YAML + markdown stored in `agent-conf/` directory
-- **`agent-conf.yaml`**: Config file specifying target agents, `nested_depth`, hierarchy resolution
+- **Canonical format**: Vendor-neutral YAML + markdown stored in `agent-pack/` directory
+- **`agent-pack.yaml`**: Config file specifying target agents, `nested_depth`, hierarchy resolution
 - **Generation targets**: Each supported tool (Claude, Cursor, Copilot) has a generator that emits the correct format
 - **Reverse-sync** (unsolved): Changes made directly to tool-specific files (e.g., editing `CLAUDE.md` during coding) need to propagate back to canonical configs
 

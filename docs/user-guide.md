@@ -1,20 +1,20 @@
-# agent-conf User Guide
+# agent-pack User Guide
 
-## What is agent-conf?
+## What is agent-pack?
 
-agent-conf manages AI agent configurations across multiple tools. You write rules once in a vendor-neutral format, and agent-conf compiles them into tool-specific config files (`CLAUDE.md`, `.cursor/rules/`, etc.).
+agent-pack manages AI agent configurations across multiple tools. You write rules once in a vendor-neutral format, and agent-pack compiles them into tool-specific config files (`CLAUDE.md`, `.cursor/rules/`, etc.).
 
 ## Installation
 
 ```bash
 # Install from GitHub
-uv tool install git+https://github.com/vkroz/agent-conf
+uv tool install git+https://github.com/vkroz/agent-pack
 
 # Or install from a local clone for development
-git clone https://github.com/agenture-org/agent-conf.git
-cd agent-conf
+git clone https://github.com/agenture-org/agent-pack.git
+cd agent-pack
 uv sync
-uv run agentconf --version
+uv run agentpack --version
 ```
 
 ## Quick Start
@@ -22,49 +22,49 @@ uv run agentconf --version
 ```bash
 # Bootstrap in your repo
 cd my-project
-agentconf init
+agentpack init
 
-# Edit your rules in agent-conf/
+# Edit your rules in agent-pack/
 # Then generate tool-specific configs
-agentconf generate
+agentpack generate
 ```
 
 ## CLI Commands
 
-### `agentconf init`
+### `agentpack init`
 
-Creates the `agent-conf/` directory structure in the current repo:
+Creates the `agent-pack/` directory structure in the current repo:
 
 ```
-agent-conf/
-  agent-conf.yaml       # Configuration
+agent-pack/
+  agent-pack.yaml       # Configuration
   rules/
     my-rule.md           # Your canonical rules
   commands/
     my-command.md        # Slash-command definitions
 ```
 
-### `agentconf generate`
+### `agentpack generate`
 
-Reads `agent-conf/agent-conf.yaml` and canonical rules, produces tool-specific output files. Generated files are placed alongside `agent-conf/` in a `.generated-agent-conf/` directory, then copied to the locations each tool expects.
+Reads `agent-pack/agent-pack.yaml` and canonical rules, produces tool-specific output files. Generated files are placed alongside `agent-pack/` in a `.generated-agent-pack/` directory, then copied to the locations each tool expects.
 
-Example: with `agents: [claude, cursor]`, running `agentconf generate` produces:
+Example: with `agents: [claude, cursor]`, running `agentpack generate` produces:
 - `CLAUDE.md` at the repo root
 - `.cursor/rules/*.mdc` files
 
-### `agentconf sync`
+### `agentpack sync`
 
-Pulls shared configurations from remote git repositories into your local `agent-conf/` directory.
+Pulls shared configurations from remote git repositories into your local `agent-pack/` directory.
 
 ```bash
 # Sync from a public rules repo
-agentconf sync https://github.com/agenture-org/agent-conf-community
+agentpack sync https://github.com/agenture-org/agent-pack-community
 
 # Sync from an org-private repo
-agentconf sync git@github.com:my-org/agent-conf-shared.git
+agentpack sync git@github.com:my-org/agent-pack-shared.git
 ```
 
-## Configuration: `agent-conf.yaml`
+## Configuration: `agent-pack.yaml`
 
 ```yaml
 # Which tools to generate configs for
@@ -85,7 +85,7 @@ gitignore: true
 
 ## Canonical Rule Format
 
-Rules are markdown files with a YAML frontmatter header, stored in `agent-conf/rules/`.
+Rules are markdown files with a YAML frontmatter header, stored in `agent-pack/rules/`.
 
 ```markdown
 ---
@@ -108,7 +108,7 @@ Your rule content in markdown.
 
 ### Commands
 
-Commands are markdown files in `agent-conf/commands/` that define slash-command workflows for agents. Same format as rules.
+Commands are markdown files in `agent-pack/commands/` that define slash-command workflows for agents. Same format as rules.
 
 ## Example
 
@@ -116,8 +116,8 @@ Given this structure:
 
 ```
 my-project/
-  agent-conf/
-    agent-conf.yaml
+  agent-pack/
+    agent-pack.yaml
     rules/
       code-style.md
       testing.md
@@ -125,14 +125,14 @@ my-project/
       review.md
 ```
 
-With `agent-conf.yaml`:
+With `agent-pack.yaml`:
 ```yaml
 agents: [claude, cursor]
 nested_depth: 1
 gitignore: true
 ```
 
-Running `agentconf generate` produces:
+Running `agentpack generate` produces:
 
 ```
 my-project/

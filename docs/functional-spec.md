@@ -1,4 +1,4 @@
-# agent-conf Functional Specification
+# agent-pack Functional Specification
 
 ## Problem Statement
 
@@ -26,22 +26,22 @@ V1 supports two generation targets:
 
 ### Functional Requirements
 
-**F1: Init** (`agentconf init`)
-- Create `agent-conf/` directory with `agent-conf.yaml`, `rules/`, `commands/` subdirectories
+**F1: Init** (`agentpack init`)
+- Create `agent-pack/` directory with `agent-pack.yaml`, `rules/`, `commands/` subdirectories
 - Optionally detect existing tool-specific configs and offer to import them into canonical format
 
-**F2: Generate** (`agentconf generate`)
-- Read `agent-conf.yaml` for target agents and settings
-- Read all canonical rules from `agent-conf/rules/` and `agent-conf/commands/`
+**F2: Generate** (`agentpack generate`)
+- Read `agent-pack.yaml` for target agents and settings
+- Read all canonical rules from `agent-pack/rules/` and `agent-pack/commands/`
 - For each target agent, produce output in the expected format and location:
   - **Claude**: concatenate all `alwaysApply: true` rules into a single `CLAUDE.md`
   - **Cursor**: emit each rule as an individual `.mdc` file in `.cursor/rules/`, preserving frontmatter as Cursor metadata
 - Respect `nested_depth` — generate configs in subdirectories up to N levels deep
 - Optionally update `.gitignore` with generated file paths
 
-**F3: Sync** (`agentconf sync <remote>`)
+**F3: Sync** (`agentpack sync <remote>`)
 - Clone/pull a remote git repo containing shared canonical rules
-- Merge remote rules into local `agent-conf/` directory
+- Merge remote rules into local `agent-pack/` directory
 - Conflict resolution: local rules override remote rules with the same filename
 
 ### Canonical Format
@@ -65,15 +65,15 @@ globs: ["*.py"]
 
 **Directory layout:**
 ```
-agent-conf/
-  agent-conf.yaml        # Project configuration
+agent-pack/
+  agent-pack.yaml        # Project configuration
   rules/                 # Canonical rule files
     *.md
   commands/              # Slash-command definitions
     *.md
 ```
 
-### Configuration: `agent-conf.yaml`
+### Configuration: `agent-pack.yaml`
 
 ```yaml
 agents: [claude, cursor]    # Target agents for generation
@@ -86,8 +86,8 @@ gitignore: true              # Auto-manage .gitignore entries
 Configurations resolve in priority order (highest wins):
 
 ```
-user       →  ~/.config/agent-conf/          # Per-user overrides
-repo       →  ./agent-conf/                  # Repo-level rules
+user       →  ~/.config/agent-pack/          # Per-user overrides
+repo       →  ./agent-pack/                  # Repo-level rules
 project    →  (inherited from parent repo)    # Multi-repo project
 org        →  (synced from org remote)        # Organization defaults
 global     →  (synced from public remote)     # Community defaults
