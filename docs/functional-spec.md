@@ -90,7 +90,7 @@ Merge shared rules from a remote git repo into the local `.agentpack/` directory
 agents: [claude, cursor]    # Target agents for generation
 gitignore: true              # Auto-manage .gitignore entries
 remotes:
-  community: https://github.com/agenture-org/agent-pack-community
+  community: https://github.com/agentpack/agent-pack-community
   my-org: git@github.com:my-org/agent-pack-shared.git
 ```
 

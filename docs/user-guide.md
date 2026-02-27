@@ -6,10 +6,10 @@ agentpack manages AI agent configurations across multiple tools. Write rules onc
 
 ```bash
 # Install from GitHub
-uv tool install git+https://github.com/agenture-org/agent-pack
+uv tool install git+https://github.com/numio-ai/agent-pack
 
 # For development
-git clone https://github.com/agenture-org/agent-pack.git
+git clone https://github.com/numio-ai/agent-pack.git
 cd agent-pack
 uv sync
 uv run agentpack --version
@@ -40,7 +40,7 @@ agentpack generate   # produces tool-specific output files
 agents: [claude, cursor]    # Target tools for generation
 gitignore: true              # Auto-add generated files to .gitignore
 remotes:
-  community: https://github.com/agenture-org/agent-pack-community
+  community: https://github.com/agentpack/agent-pack-community
   my-org: git@github.com:my-org/agent-pack-shared.git
 ```
 

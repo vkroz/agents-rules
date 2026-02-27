@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional
 
 import typer
+import yaml
 
 from agent_pack import __version__
 
@@ -82,10 +83,137 @@ def init(
     typer.echo("\nNext: edit your rules, then run `agentpack generate`.")
 
 
+def _load_config(ap_dir: Path) -> dict:
+    config_path = ap_dir / "agentpack.yaml"
+    if not config_path.exists():
+        typer.echo(f"Config not found: {config_path}", err=True)
+        raise typer.Exit(code=1)
+    with open(config_path) as f:
+        return yaml.safe_load(f) or {}
+
+
+def _find_skill_md(skill_dir: Path) -> Optional[Path]:
+    """Return the skill markdown file in a skill directory (case-insensitive match for skill.md)."""
+    for f in skill_dir.iterdir():
+        if f.is_file() and f.name.lower() == "skill.md":
+            return f
+    return None
+
+
+def _generate_claude(root: Path, ap_dir: Path) -> None:
+    rules_dir = ap_dir / "rules"
+    skills_dir = ap_dir / "skills"
+
+    # AGENTS.md → .claude/CLAUDE.md
+    agents_md = rules_dir / "AGENTS.md"
+    if agents_md.exists():
+        out = root / ".claude" / "CLAUDE.md"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(agents_md.read_text())
+        typer.echo(f"  {out.relative_to(root)}")
+
+    # Other rules → .claude/rules/*.md
+    for rule_file in sorted(rules_dir.glob("*.md")):
+        if rule_file.name == "AGENTS.md":
+            continue
+        out = root / ".claude" / "rules" / rule_file.name
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(rule_file.read_text())
+        typer.echo(f"  {out.relative_to(root)}")
+
+    # Skills → .claude/skills/<name>.md
+    if skills_dir.exists():
+        for skill_dir in sorted(d for d in skills_dir.iterdir() if d.is_dir()):
+            skill_md = _find_skill_md(skill_dir)
+            if skill_md:
+                out = root / ".claude" / "skills" / f"{skill_dir.name}.md"
+                out.parent.mkdir(parents=True, exist_ok=True)
+                out.write_text(skill_md.read_text())
+                typer.echo(f"  {out.relative_to(root)}")
+
+
+def _generate_cursor(root: Path, ap_dir: Path) -> None:
+    rules_dir = ap_dir / "rules"
+    skills_dir = ap_dir / "skills"
+
+    # All rules → .cursor/rules/*.md (AGENTS.md keeps its name)
+    for rule_file in sorted(rules_dir.glob("*.md")):
+        out = root / ".cursor" / "rules" / rule_file.name
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(rule_file.read_text())
+        typer.echo(f"  {out.relative_to(root)}")
+
+    # Skills → .cursor/rules/<name>.md
+    if skills_dir.exists():
+        for skill_dir in sorted(d for d in skills_dir.iterdir() if d.is_dir()):
+            skill_md = _find_skill_md(skill_dir)
+            if skill_md:
+                out = root / ".cursor" / "rules" / f"{skill_dir.name}.md"
+                out.parent.mkdir(parents=True, exist_ok=True)
+                out.write_text(skill_md.read_text())
+                typer.echo(f"  {out.relative_to(root)}")
+
+
+def _update_gitignore(root: Path, agents: list) -> None:
+    gitignore = root / ".gitignore"
+    entries = []
+    if "claude" in agents:
+        entries.append(".claude/")
+    if "cursor" in agents:
+        entries.append(".cursor/")
+
+    existing = gitignore.read_text() if gitignore.exists() else ""
+    lines = existing.splitlines()
+
+    added = []
+    for entry in entries:
+        if entry not in lines:
+            lines.append(entry)
+            added.append(entry)
+
+    if added:
+        gitignore.write_text("\n".join(lines) + "\n")
+        for e in added:
+            typer.echo(f"  .gitignore: added {e}")
+
+
 @app.command()
-def generate():
+def generate(
+    path: Optional[Path] = typer.Argument(
+        None,
+        help="Target directory. Defaults to current directory.",
+    ),
+):
     """Compile canonical rulesets into tool-specific configs."""
-    print("agentpack generate: not yet implemented")
+    root = (path or Path.cwd()).resolve()
+    ap_dir = root / AGENTPACK_DIR
+
+    if not ap_dir.exists():
+        typer.echo("Not initialized. Run `agentpack init` first.", err=True)
+        raise typer.Exit(code=1)
+
+    config = _load_config(ap_dir)
+    agents = config.get("agents", [])
+    use_gitignore = config.get("gitignore", True)
+
+    if not agents:
+        typer.echo("No agents configured in agentpack.yaml", err=True)
+        raise typer.Exit(code=1)
+
+    typer.echo("Generating...")
+
+    if "claude" in agents:
+        typer.echo("Claude:")
+        _generate_claude(root, ap_dir)
+
+    if "cursor" in agents:
+        typer.echo("Cursor:")
+        _generate_cursor(root, ap_dir)
+
+    if use_gitignore:
+        _update_gitignore(root, agents)
+
+    typer.echo("Done.")
 
 
 @app.command()

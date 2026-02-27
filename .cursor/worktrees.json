@@ -1,5 +1,0 @@
-{
-  "setup-worktree": [
-    "echo '*** setup-worktree - noops ***'"
-  ]
-}
