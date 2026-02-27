@@ -1,16 +1,14 @@
-# agent-pack User Guide
+# agentpack User Guide
 
-## What is agent-pack?
-
-agent-pack manages AI agent configurations across multiple tools. You write rules once in a vendor-neutral format, and agent-pack compiles them into tool-specific config files (`CLAUDE.md`, `.cursor/rules/`, etc.).
+agentpack manages AI agent configurations across multiple tools. Write rules once in a vendor-neutral format; agentpack compiles them into tool-specific files (`CLAUDE.md`, `.cursor/rules/`, etc.).
 
 ## Installation
 
 ```bash
 # Install from GitHub
-uv tool install git+https://github.com/vkroz/agent-pack
+uv tool install git+https://github.com/agenture-org/agent-pack
 
-# Or install from a local clone for development
+# For development
 git clone https://github.com/agenture-org/agent-pack.git
 cd agent-pack
 uv sync
@@ -20,126 +18,84 @@ uv run agentpack --version
 ## Quick Start
 
 ```bash
-# Bootstrap in your repo
 cd my-project
-agentpack init
-
-# Edit your rules in agent-pack/
-# Then generate tool-specific configs
-agentpack generate
+agentpack init       # creates .agentpack/ with starter config
+# edit rules in .agentpack/rules/
+agentpack generate   # produces tool-specific output files
 ```
 
-## CLI Commands
+## Commands
 
-### `agentpack init`
+| Command | Description |
+|---------|-------------|
+| `agentpack init` | Bootstrap `.agentpack/` in the current repo |
+| `agentpack generate` | Compile canonical rules into tool-specific configs |
+| `agentpack sync [<remote>]` | Pull shared rules from a remote git repo |
 
-Creates the `agent-pack/` directory structure in the current repo:
+`<remote>` is a name from `agentpack.yaml` or a full git URL. If omitted, syncs all configured remotes.
 
-```
-agent-pack/
-  agent-pack.yaml       # Configuration
-  rules/
-    my-rule.md           # Your canonical rules
-  commands/
-    my-command.md        # Slash-command definitions
-```
-
-### `agentpack generate`
-
-Reads `agent-pack/agent-pack.yaml` and canonical rules, produces tool-specific output files. Generated files are placed alongside `agent-pack/` in a `.generated-agent-pack/` directory, then copied to the locations each tool expects.
-
-Example: with `agents: [claude, cursor]`, running `agentpack generate` produces:
-- `CLAUDE.md` at the repo root
-- `.cursor/rules/*.mdc` files
-
-### `agentpack sync`
-
-Pulls shared configurations from remote git repositories into your local `agent-pack/` directory.
-
-```bash
-# Sync from a public rules repo
-agentpack sync https://github.com/agenture-org/agent-pack-community
-
-# Sync from an org-private repo
-agentpack sync git@github.com:my-org/agent-pack-shared.git
-```
-
-## Configuration: `agent-pack.yaml`
+## Configuration: `agentpack.yaml`
 
 ```yaml
-# Which tools to generate configs for
-agents: [claude, cursor]
-
-# How many directory levels deep to generate nested configs
-nested_depth: 2
-
-# Add generated files to .gitignore
-gitignore: true
+agents: [claude, cursor]    # Target tools for generation
+gitignore: true              # Auto-add generated files to .gitignore
+remotes:
+  community: https://github.com/agenture-org/agent-pack-community
+  my-org: git@github.com:my-org/agent-pack-shared.git
 ```
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `agents` | list | `[claude]` | Target tools: `claude`, `cursor` |
-| `nested_depth` | int | `1` | Directory depth for nested config generation |
-| `gitignore` | bool | `true` | Auto-add generated files to `.gitignore` |
+| Field | Required | Description |
+|-------|----------|-------------|
+| `agents` | Yes | Target tools: `claude`, `cursor` |
+| `gitignore` | No | Auto-add generated files to `.gitignore`. Default: `true`. |
+| `remotes` | No | Named remote repos for `agentpack sync`. Keys are names; values are git URLs (HTTPS or SSH). |
 
-## Canonical Rule Format
+## Directory Layout
 
-Rules are markdown files with a YAML frontmatter header, stored in `agent-pack/rules/`.
+```
+.agentpack/
+  agentpack.yaml
+  rules/
+    AGENTS.md           # Main project instructions
+    *.md                # Modular rules
+  skills/
+    <name>/
+      skill.md          # One directory per skill
+```
+
+## Rule Format
 
 ```markdown
 ---
-description: Short description of what this rule does
-alwaysApply: true
+description: "What this rule does"
+paths: ["src/api/**/*.ts"]   # optional: file patterns that trigger this rule
+alwaysApply: false            # optional: if true, always active
 ---
 
-# Rule Title
-
-Your rule content in markdown.
+Rule content in markdown.
 ```
 
-### Frontmatter Fields
+## Skill Format
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `description` | string | yes | One-line summary, used by tools that support rule metadata |
-| `alwaysApply` | bool | no | If `true`, rule is always active (default: `false`) |
-| `globs` | list | no | File patterns that trigger this rule (e.g., `["*.py", "tests/**"]`) |
+```markdown
+---
+name: deploy
+description: "What this skill does"
+claude:
+    allowed-tools: Read, Grep
+cursor:
+    compatibility: network access
+---
 
-### Commands
-
-Commands are markdown files in `agent-pack/commands/` that define slash-command workflows for agents. Same format as rules.
-
-## Example
-
-Given this structure:
-
-```
-my-project/
-  agent-pack/
-    agent-pack.yaml
-    rules/
-      code-style.md
-      testing.md
-    commands/
-      review.md
+Skill content in markdown.
 ```
 
-With `agent-pack.yaml`:
-```yaml
-agents: [claude, cursor]
-nested_depth: 1
-gitignore: true
-```
+## Generated Output
 
-Running `agentpack generate` produces:
+Given `agents: [claude, cursor]`, `agentpack generate` produces:
 
-```
-my-project/
-  CLAUDE.md                          # Combined rules for Claude Code
-  .cursor/
-    rules/
-      code-style.mdc                 # Individual rule files for Cursor
-      testing.mdc
-  .gitignore                         # Updated with generated file paths
-```
+| Source | Claude output | Cursor output |
+|--------|--------------|---------------|
+| `.agentpack/rules/AGENTS.md` | `.claude/CLAUDE.md` | `.cursor/rules/AGENTS.md` |
+| `.agentpack/rules/*.md` | `.claude/rules/*.md` | `.cursor/rules/*.md` |
+| `.agentpack/skills/<name>/skill.md` | `.claude/skills/<name>.md` | `.cursor/rules/<name>.md` |

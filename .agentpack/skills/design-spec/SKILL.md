@@ -1,13 +1,15 @@
 ---
 description: Workflow for software design phase — iterative collaboration to produce an approved design document
+claude:
+    argument-hint: [spec-or-task-file]
 ---
 
 # Design Workflow
 
 ## Usage
-Invoke with: `/design <spec-or-task-file>`
+Invoke with: `/design-spec <spec-or-task-file>`
 
-Example: `/design @docs/lmgate specification.md`
+Example: `/design-spec @docs/lmgate specification.md`
 
 ## Objective
 Collaborate with the user **iteratively** to produce a **design document** that captures all architectural decisions, component structures, and operational concerns needed for implementation.
