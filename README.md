@@ -40,7 +40,7 @@ Hierarchical inheritance is a core concept in `agentpack`: rules are designed to
 ## Generated output
 
 Given `agents: [claude, cursor]`:
-- `.agentpack/rules/AGENTS.md` -> `.claude/CLAUDE.md` and `.cursor/rules/AGENTS.md`
+- `.agentpack/rules/CLAUDE.md` -> `CLAUDE.md` (root) and `AGENTS.md` (root, cursor-only)
 - `.agentpack/rules/*.md` -> `.claude/rules/*.md` and `.cursor/rules/*.md`
 - `.agentpack/skills/<name>/skill.md` -> `.claude/skills/<name>.md` and `.cursor/rules/<name>.md`
 

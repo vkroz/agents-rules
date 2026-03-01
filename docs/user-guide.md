@@ -96,6 +96,6 @@ Given `agents: [claude, cursor]`, `agentpack generate` produces:
 
 | Source | Claude output | Cursor output |
 |--------|--------------|---------------|
-| `.agentpack/rules/AGENTS.md` | `.claude/CLAUDE.md` | `.cursor/rules/AGENTS.md` |
+| `.agentpack/rules/CLAUDE.md` | `CLAUDE.md` (root) | `AGENTS.md` (root, cursor-only) |
 | `.agentpack/rules/*.md` | `.claude/rules/*.md` | `.cursor/rules/*.md` |
 | `.agentpack/skills/<name>/skill.md` | `.claude/skills/<name>.md` | `.cursor/rules/<name>.md` |

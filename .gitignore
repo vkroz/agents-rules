@@ -10,3 +10,4 @@ dist/
 .ruff_cache/
 .claude/
 .cursor/
+CLAUDE.md
